@@ -31,6 +31,7 @@ int VerificaSeEstaVazia(descritor *);
 Aluno AcessarPrimeiroELemento(descritor *);
 Aluno AcessarUltimoELemento(descritor *);
 void InserirInicio(nodo *, descritor *, Aluno *);
+void InserirNoMeio(nodo *, descritor *, Aluno);
 void InserirNoFinal(nodo *, descritor *, Aluno *);
 void ExcluirDoInicio(nodo *, descritor *);
 void ExcluirDoFinal(descritor *);
@@ -43,11 +44,16 @@ int main()
     nodo *L = (nodo *)malloc(sizeof(nodo));
     descritor *D = (descritor *)malloc(sizeof(descritor));
     InicializarLista(L, D);
-    SeedAlunos(L,D);
+    SeedAlunos(L, D);
     int op;
 
     while (1)
     {
+        Aluno aluno;
+        aluno.nota = 6;
+        aluno.turma = 54;
+        strcpy(aluno.nome, "Bruno");
+
         printf("\n1-Inserir no inicio;");
         printf("\n2-Inserir no final;");
         printf("\n3-Excluir do inicio;");
@@ -55,8 +61,8 @@ int main()
         printf("\n5-Excluir lista inteira;");
         printf("\n6-Mostrar lista em ordem crescente;");
         printf("\n7-Mostrar lista em ordem decrescente;");
-
-        printf("\n4-Sair");
+        printf("\n8-Inserir elemento em posicao intermediaria.");
+        printf("\n9-Sair");
 
         printf("\nDigite a opcao desejada:");
         scanf("%d", &op);
@@ -84,9 +90,11 @@ int main()
         case 7:
             ImprimeTodosOsElementos(L, D, 'd');
             break;
-
-        // case 4:
-        //     exit(0);
+        case 8:
+            InserirNoMeio(L, D, aluno);
+            break;
+        case 9:
+            exit(0);
         default:
             printf("\nOpcao invalida.");
         }
@@ -97,17 +105,18 @@ int main()
     return 1;
 }
 
-void SeedAlunos(nodo *L, descritor *D) {
+void SeedAlunos(nodo *L, descritor *D)
+{
     Aluno alunos[] = {
         {"Alice", 8, 101},
         {"Bruno", 7, 102},
         {"Carla", 9, 101},
         {"Daniel", 6, 103},
-        {"Elisa", 7, 102}
-    };
+        {"Elisa", 7, 102}};
     int quantidade = sizeof(alunos) / sizeof(alunos[0]);
-    
-    for (int i = 0; i < quantidade; i++) {
+
+    for (int i = 0; i < quantidade; i++)
+    {
         InserirNoFinal(L, D, &alunos[i]);
     }
 }
@@ -167,6 +176,43 @@ void InserirInicio(nodo *L, descritor *D, Aluno *dado)
     D->primeiro = novoNo;
     novoNo->ant = NULL;
 }
+void InserirNoMeio(nodo *L, descritor *D, Aluno dado)
+{
+    nodo *novoNo = (nodo *)malloc(sizeof(nodo));
+    strcpy(novoNo->dado.nome, dado.nome);
+    novoNo->dado.nota = dado.nota;
+    novoNo->dado.turma = dado.turma;
+
+    if (VerificaSeEstaVazia(D))
+    {
+        L->prox = novoNo;
+        novoNo->ant = NULL;
+        novoNo->prox = NULL;
+        D->primeiro = novoNo;
+        D->ultimo = novoNo;
+    }
+    else
+    {
+        nodo *temp, *ant;
+        nodo *no = L->prox;
+        while (no != NULL)
+        {
+            if (strcmp(no->dado.nome, dado.nome) == 0)
+            {
+                ant = no;
+                temp = no->prox;
+                novoNo->ant = ant;
+                novoNo->prox = temp;
+                no->prox = novoNo;
+                temp->ant = novoNo;
+                break;
+            }
+            no = no->prox;
+        }
+    }
+    D->quantidade++;
+}
+
 void InserirNoFinal(nodo *L, descritor *D, Aluno *dado)
 {
     nodo *novo = (nodo *)malloc(sizeof(nodo));
@@ -274,7 +320,8 @@ void cadastrar_aluno(nodo *L, descritor *D, char local)
     if (local == 'i')
     {
         InserirInicio(L, D, novoAluno);
-    }else if (local == 'f')
+    }
+    else if (local == 'f')
     {
         InserirNoFinal(L, D, novoAluno);
     }
