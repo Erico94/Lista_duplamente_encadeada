@@ -25,6 +25,7 @@ struct Descritor
 };
 typedef struct Descritor descritor;
 
+void SeedAlunos(nodo *, descritor *);
 void InicializarLista(nodo *, descritor *);
 int VerificaSeEstaVazia(descritor *);
 Aluno AcessarPrimeiroELemento(descritor *);
@@ -35,17 +36,80 @@ void ExcluirDoInicio(nodo *, descritor *);
 void ExcluirDoFinal(descritor *);
 void ExcluirListaInteira(nodo *, descritor *);
 void ImprimeTodosOsElementos(nodo *, descritor *, char);
+void cadastrar_aluno(nodo *, descritor *, char);
 
 int main()
 {
-    Aluno aluno;
     nodo *L = (nodo *)malloc(sizeof(nodo));
     descritor *D = (descritor *)malloc(sizeof(descritor));
     InicializarLista(L, D);
+    SeedAlunos(L,D);
+    int op;
+
+    while (1)
+    {
+        printf("\n1-Inserir no inicio;");
+        printf("\n2-Inserir no final;");
+        printf("\n3-Excluir do inicio;");
+        printf("\n4-Excluir do final;");
+        printf("\n5-Excluir lista inteira;");
+        printf("\n6-Mostrar lista em ordem crescente;");
+        printf("\n7-Mostrar lista em ordem decrescente;");
+
+        printf("\n4-Sair");
+
+        printf("\nDigite a opcao desejada:");
+        scanf("%d", &op);
+
+        switch (op)
+        {
+        case 1:
+            cadastrar_aluno(L, D, 'i');
+            break;
+        case 2:
+            cadastrar_aluno(L, D, 'f');
+            break;
+        case 3:
+            ExcluirDoInicio(L, D);
+            break;
+        case 4:
+            ExcluirDoFinal(D);
+            break;
+        case 5:
+            ExcluirListaInteira(L, D);
+            break;
+        case 6:
+            ImprimeTodosOsElementos(L, D, 'c');
+            break;
+        case 7:
+            ImprimeTodosOsElementos(L, D, 'd');
+            break;
+
+        // case 4:
+        //     exit(0);
+        default:
+            printf("\nOpcao invalida.");
+        }
+    }
 
     free(L);
     free(D);
     return 1;
+}
+
+void SeedAlunos(nodo *L, descritor *D) {
+    Aluno alunos[] = {
+        {"Alice", 8, 101},
+        {"Bruno", 7, 102},
+        {"Carla", 9, 101},
+        {"Daniel", 6, 103},
+        {"Elisa", 7, 102}
+    };
+    int quantidade = sizeof(alunos) / sizeof(alunos[0]);
+    
+    for (int i = 0; i < quantidade; i++) {
+        InserirNoFinal(L, D, &alunos[i]);
+    }
 }
 
 void InicializarLista(nodo *L, descritor *D)
@@ -180,17 +244,39 @@ void ImprimeTodosOsElementos(nodo *L, descritor *D, char ordem)
         printf("%-10s %-6s %-5s", "Nome", "Nota", "Turma");
         while (temp != NULL)
         {
-            printf("%-10s %-6.1f %-4d", temp->dado.nome, temp->dado.nota, temp->dado.turma);
+            printf("\n%-10s %-6.1f %-4d", temp->dado.nome, temp->dado.nota, temp->dado.turma);
             temp = temp->prox;
         };
-    }else if(ordem =='d'){
+    }
+    else if (ordem == 'd')
+    {
         nodo *temp = D->ultimo;
         printf("%-10s %-6s %-5s", "Nome", "Nota", "Turma");
         while (temp != NULL)
         {
-            printf("%-10s %-6.1f %-4d", temp->dado.nome, temp->dado.nota, temp->dado.turma);
+            printf("\n%-10s %-6.1f %-4d", temp->dado.nome, temp->dado.nota, temp->dado.turma);
             temp = temp->ant;
         };
     }
     printf("\n\n");
+}
+void cadastrar_aluno(nodo *L, descritor *D, char local)
+{
+    Aluno *novoAluno = (Aluno *)malloc(sizeof(Aluno));
+    printf("\nDados do aluno:");
+    getchar();
+    printf("\nNome:");
+    scanf("%[^\n]s", novoAluno->nome);
+    printf("\nNota:");
+    scanf("%f", &novoAluno->nota);
+    printf("\nTurma (numero):");
+    scanf("%d", &novoAluno->turma);
+    if (local == 'i')
+    {
+        InserirInicio(L, D, novoAluno);
+    }else if (local == 'f')
+    {
+        InserirNoFinal(L, D, novoAluno);
+    }
+    return;
 }
